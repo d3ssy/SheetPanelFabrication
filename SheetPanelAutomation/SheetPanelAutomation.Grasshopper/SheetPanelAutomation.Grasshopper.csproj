@@ -57,7 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SheetPanelAutomationGrasshopperComponent.cs" />
-    <Compile Include="SheetPanelAutomation.GrasshopperInfo.cs" />
+    <Compile Include="SheetPanelAutomation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="..\SheetPanelAutomation.Core\SheetPanelAutomation.Core.projitems" Label="Shared" />

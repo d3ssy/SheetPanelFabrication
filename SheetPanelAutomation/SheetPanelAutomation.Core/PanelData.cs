@@ -5,6 +5,7 @@ using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using SheetPanelAutomation.Core.Interfaces;
 
 namespace SheetPanelAutomation.Core
 {
@@ -77,7 +78,7 @@ namespace SheetPanelAutomation.Core
         public Plane FacePlane { get; set; }
         public Point3d DatumPoint { get; set; }
         public Polyline ProfileBoundary { get; set; }
-        public List<HoleSpec> HoleSpecifications { get; set; }
+        public List<IHoleSpec> HoleSpecifications { get; set; }
         public List<Curve> Cutouts { get; set; }
         public TextEntity Label { get; set; }
         public Point3d Centroid { get; set; }
