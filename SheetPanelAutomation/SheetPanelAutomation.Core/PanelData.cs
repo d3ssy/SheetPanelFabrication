@@ -1,16 +1,12 @@
-﻿using Rhino;
-using Rhino.Commands;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Runtime.InteropServices;
-using Rhino.Collections;
-using Rhino.DocObjects;
+﻿using Rhino.Collections;
 using Rhino.DocObjects.Custom;
 using Rhino.FileIO;
 using Rhino.Geometry;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
-namespace SheetPanelAutomation.Rhino
+namespace SheetPanelAutomation.Core
 {
     // You must define a Guid attribute for your user data derived class
     // in order to support serialization. Every custom user data class
@@ -23,7 +19,10 @@ namespace SheetPanelAutomation.Rhino
 
         public override string Description => throw new NotImplementedException();
 
-        public override string ToString() => "Some custom panel data.";
+        public override string ToString()
+        {
+            return "Some custom panel data.";
+        }
 
         protected override void OnDuplicate(UserData source)
         {
@@ -41,7 +40,10 @@ namespace SheetPanelAutomation.Rhino
             {
                 // make up some rule as to if this should be saved in the 3dm file
                 if (FacePlane != null && FacePlane.IsValid && DatumPoint != null && DatumPoint.IsValid)
+                {
                     return true;
+                }
+
                 return false;
             }
         }
@@ -65,7 +67,7 @@ namespace SheetPanelAutomation.Rhino
             //  archive.Write3dmChunkVersion(1, 0);
             //  archive.WriteInt(IntegerData);
             //  archive.WriteString(StringData);
-            var dict = new ArchivableDictionary(1, "PanelData");
+            ArchivableDictionary dict = new ArchivableDictionary(1, "PanelData");
             dict.Set("FacePlane", FacePlane);
             dict.Set("DatumPoint", DatumPoint);
             archive.WriteDictionary(dict);

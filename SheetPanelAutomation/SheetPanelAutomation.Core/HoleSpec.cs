@@ -1,6 +1,6 @@
 ﻿using Rhino.Geometry;
 
-namespace SheetPanelAutomation.Rhino
+namespace SheetPanelAutomation.Core
 {
     public class HoleSpec
     {

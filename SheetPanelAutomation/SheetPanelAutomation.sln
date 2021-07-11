@@ -7,7 +7,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SheetPanelAutomation.Grassh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SheetPanelAutomation.Rhino", "SheetPanelAutomation.Rhino\SheetPanelAutomation.Rhino.csproj", "{7C8BB21B-E240-4594-8148-AB9875BC5E0D}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SheetPanelAutomation.Core", "SheetPanelAutomation.Core\SheetPanelAutomation.Core.shproj", "{0D4953BB-A106-4643-BE33-E9BB6B05BD16}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SheetPanelAutomation.Core\SheetPanelAutomation.Core.projitems*{0d4953bb-a106-4643-be33-e9bb6b05bd16}*SharedItemsImports = 13
+		SheetPanelAutomation.Core\SheetPanelAutomation.Core.projitems*{7c8bb21b-e240-4594-8148-ab9875bc5e0d}*SharedItemsImports = 4
+		SheetPanelAutomation.Core\SheetPanelAutomation.Core.projitems*{e7a839ba-4328-4867-842a-91394e6a2719}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

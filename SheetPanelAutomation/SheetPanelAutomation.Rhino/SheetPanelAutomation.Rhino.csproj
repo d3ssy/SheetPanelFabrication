@@ -53,16 +53,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HoleSpec.cs" />
-    <Compile Include="PanelData.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SheetPanelAutomationRhinoCommand.cs" />
     <Compile Include="SheetPanelAutomationRhinoPlugIn.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SlotSpec.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\plugin-utility.ico" />
   </ItemGroup>
+  <Import Project="..\SheetPanelAutomation.Core\SheetPanelAutomation.Core.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
