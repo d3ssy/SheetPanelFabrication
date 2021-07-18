@@ -1,16 +1,4 @@
 ﻿Rhino plug-in creating an extrusion from a geometry line, and the possibility to change the extrusion via userText panel.
 
 Problems:
-
-1. inside ```private void OnModifyObjectAttributes``` I use the ```RuntimeSerialNumber``` to exclude the element that is not selected, 
-to avoid that every geometry into the document changes the userText values, 
-is this the correct way? Or should I use ```this.IsSelected()```?
-
-2. if I pick a grip and move it, my extrusion disappears. 
-I put into ```public void OnBeforeTransformObjects``` the logic to catch the variation of the grip and change the point location, 
-but after this event, the ```OnDraw``` method is not fired.
-
-3. I noticed that if I create geometries and deleted some of them the events still catch the geometries deleted and operate on them, 
-also the ```OnDraw``` is called, how I can dispose of the deleted geometries from the memory?
-
-4. The plug-in as to be loaded al the time, when I re-open rhino.
+1. The plug-in as to be loaded al the time, when I re-open rhino.
