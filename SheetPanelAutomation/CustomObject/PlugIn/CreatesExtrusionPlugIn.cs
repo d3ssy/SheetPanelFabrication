@@ -1,5 +1,6 @@
 ﻿using Rhino;
 using Rhino.Commands;
+using Rhino.Display;
 using Rhino.DocObjects;
 using Rhino.Geometry;
 using Rhino.PlugIns;
@@ -23,6 +24,7 @@ namespace CustomObject.PlugIn
             RhinoDoc.ModifyObjectAttributes += OnModifyObjectAttributes;
             RhinoDoc.BeforeTransformObjects += OnBeforeTransformObjects;
             Command.EndCommand += EndCommand;
+            DisplayPipeline.CalculateBoundingBox += AddBBox;
         }
 
         ///<summary>Gets the only instance of the RhinoCommonTestPlugIn plug-in.</summary>
@@ -79,6 +81,17 @@ namespace CustomObject.PlugIn
                 ObjRef geoRef = new ObjRef(rhinoObject);
                 CustomGeo geo = new CustomGeo(datumLine, width, height);
                 _ = doc.Objects.Replace(geoRef, geo);
+            }
+        }
+
+        public void AddBBox(object sender, CalculateBoundingBoxEventArgs e)
+        {
+            var objs = e.RhinoDoc.Objects.FindByObjectType(ObjectType.Curve);
+            foreach (RhinoObject rhinoObject in objs)
+            {
+                if (!(rhinoObject is CustomGeo customGeo)) return;
+
+                e.IncludeBoundingBox(customGeo.bBox);
             }
         }
     }

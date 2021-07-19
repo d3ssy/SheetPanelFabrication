@@ -1,4 +1,0 @@
-﻿Rhino plug-in creating an extrusion from a geometry line, and the possibility to change the extrusion via userText panel.
-
-Problems:
-1. The plug-in as to be loaded al the time, when I re-open rhino.

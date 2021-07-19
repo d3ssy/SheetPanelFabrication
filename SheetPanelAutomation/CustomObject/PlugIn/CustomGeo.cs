@@ -1,4 +1,5 @@
-﻿using Rhino;
+﻿using System;
+using Rhino;
 using Rhino.Display;
 using Rhino.DocObjects;
 using Rhino.DocObjects.Custom;
@@ -12,6 +13,7 @@ namespace CustomObject.PlugIn
         private double Width => double.Parse(this.Attributes.GetUserString("Width"));
         private double Height => double.Parse(this.Attributes.GetUserString("Height"));
         public Line DatumLine;
+        public BoundingBox bBox => CreateBrep().GetBoundingBox(false);
 
         public CustomGeo() : base()
         {
@@ -27,20 +29,15 @@ namespace CustomObject.PlugIn
         protected override void OnDraw(Rhino.Display.DrawEventArgs e)
         {
             base.OnDraw(e);
+            if (this.IsSelected(false) < 0) return;
             var material = new DisplayMaterial(Color.FromArgb(230, 180, 60), 0.2);
             material.BackDiffuse = Color.FromArgb(230, 180, 60);
             material.IsTwoSided = true;
 
-            Plane pl = new Plane(DatumLine.From, DatumLine.Direction);
-            Rectangle3d rec = new Rectangle3d(pl, Width, Height);
-            Brep[] planarBrep = Brep.CreatePlanarBreps(rec.ToNurbsCurve(), Rhino.RhinoMath.ZeroTolerance);
-            var box = planarBrep[0].Faces[0].CreateExtrusion(DatumLine.ToNurbsCurve(), true);
+            var box = CreateBrep();
 
-            var m = new Mesh();
-            var meshs = Mesh.CreateFromBrep(box, MeshingParameters.Default);
-            m.Append(meshs);
             e.Display.DrawBrepWires(box, Attributes.DrawColor(e.RhinoDoc), Attributes.WireDensity);
-            e.Display.DrawMeshShaded(m, material);
+            e.Display.DrawBrepShaded(box, material);
         }
 
         protected override void OnDuplicate(RhinoObject source)
@@ -61,6 +58,13 @@ namespace CustomObject.PlugIn
             base.OnTransform(transform);
             DatumLine.Transform(transform);
             CurveGeometry.Transform(transform);
+        }
+        private Brep CreateBrep()
+        {
+            Plane pl = new Plane(DatumLine.From, DatumLine.Direction);
+            Rectangle3d rec = new Rectangle3d(pl, Width, Height);
+            Brep[] planarBrep = Brep.CreatePlanarBreps(rec.ToNurbsCurve(), Rhino.RhinoMath.ZeroTolerance);
+            return planarBrep[0].Faces[0].CreateExtrusion(DatumLine.ToNurbsCurve(), true);
         }
     }
 }

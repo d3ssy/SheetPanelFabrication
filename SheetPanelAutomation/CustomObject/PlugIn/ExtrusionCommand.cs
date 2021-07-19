@@ -1,4 +1,9 @@
-﻿using Rhino;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Rhino;
 using Rhino.Commands;
 using Rhino.Geometry;
 using Rhino.Input;
@@ -12,6 +17,7 @@ namespace CustomObject.PlugIn
             RhinoGet.GetLine(out Line line);
             var geo = new CustomGeo(line, 10, 10);
             doc.Objects.AddRhinoObject(geo, null);
+
             return Result.Success;
         }
 
