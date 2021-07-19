@@ -2,6 +2,7 @@
 using Rhino;
 using Rhino.DocObjects;
 using Rhino.Geometry;
+using Rhino.PlugIns;
 
 namespace CustomExtrudedProfile
 {
@@ -25,8 +26,9 @@ namespace CustomExtrudedProfile
         }
 
         ///<summary>Gets the only instance of the RhinoCommonTestPlugIn plug-in.</summary>
-        public static CreatesExtrusionPlugIn Instance { get; private set; }
+        public static CustomExtrudedProfilePlugIn Instance { get; private set; }
 
+        public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
         protected override LoadReturnCode OnLoad(ref string errorMessage)
         {
             return LoadReturnCode.Success;
@@ -38,6 +40,8 @@ namespace CustomExtrudedProfile
 
         private void OnModifyObjectAttributes(object sender, RhinoModifyObjectAttributesEventArgs e)
         {
+            if (!(e.RhinoObject is CustomGeo customGeo)) return;
+            customGeo.UpdateExtrudedProfile();
         }
 
         private void OnBeforeTransformObjects(object sender, RhinoTransformObjectsEventArgs e)
@@ -49,15 +53,15 @@ namespace CustomExtrudedProfile
                 var grips = customGeo.GetGrips();
                 foreach (GripObject grip in grips)
                 {
-                    if (grip.OriginalLocation == customGeo.Centreline.From)
+                    if (grip.OriginalLocation == customGeo.CentreLine.From)
                     {
-                        customGeo.Centreline = new Line(grip.CurrentLocation, customGeo.Centreline.To);
+                        customGeo.CentreLine = new Line(grip.CurrentLocation, customGeo.CentreLine.To);
                         RhinoApp.WriteLine($"Transformed the start point -> {grip.CurrentLocation}");
                     }
 
-                    if (grip.OriginalLocation == customGeo.Centreline.To)
+                    if (grip.OriginalLocation == customGeo.CentreLine.To)
                     {
-                        customGeo.Centreline = new Line(customGeo.Centreline.From, grip.CurrentLocation);
+                        customGeo.CentreLine = new Line(customGeo.CentreLine.From, grip.CurrentLocation);
                         RhinoApp.WriteLine($"Transformed the end point -> {grip.CurrentLocation}");
                     }
                 }

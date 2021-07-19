@@ -11,7 +11,7 @@ namespace CustomExtrudedProfile
 {
     public class CustomGeo : CustomCurveObject
     {
-        private Line _centreline;
+        private Line _centreLine;
 
         private Brep _extrudedProfile;
 
@@ -20,23 +20,23 @@ namespace CustomExtrudedProfile
             DisplayPipeline.CalculateBoundingBox += AddBBox;
         }
 
-        public CustomGeo(Line centreline, double width, double height) : base(centreline.ToNurbsCurve())
+        public CustomGeo(Line centreLine, double width, double height) : base(centreLine.ToNurbsCurve())
         {
-            _centreline = centreline;
+            _centreLine = centreLine;
             Attributes.SetUserString("Width", width.ToString());
             Attributes.SetUserString("Height", height.ToString());
             _extrudedProfile = CreateExtrudedProfile(width, height);
             DisplayPipeline.CalculateBoundingBox += AddBBox;
         }
 
-        public Line Centreline
+        public Line CentreLine
         {
-            get => _centreline;
+            get => _centreLine;
             set
             {
-                if (!value.IsValid) throw new ArgumentException("Line is not valid.", nameof(Centreline));
+                if (!value.IsValid) throw new ArgumentException("Line is not valid.", nameof(CentreLine));
 
-                _centreline = value;
+                _centreLine = value;
                 _extrudedProfile = CreateExtrudedProfile(Width, Height);
             }
         }
@@ -71,18 +71,18 @@ namespace CustomExtrudedProfile
             base.OnDuplicate(source);
             if (source is CustomGeo src)
             {
-                _centreline = src._centreline;
+                _centreLine = src._centreLine;
                 _extrudedProfile = src._extrudedProfile.DuplicateBrep();
                 Attributes.SetUserString("Width", src.Width.ToString());
                 Attributes.SetUserString("Height", src.Height.ToString());
-                SetCurve(src._centreline.ToNurbsCurve());
+                SetCurve(src._centreLine.ToNurbsCurve());
             }
         }
         protected override void OnTransform(Transform transform)
         {
             RhinoApp.WriteLine("OnTransform");
             base.OnTransform(transform);
-            _centreline.Transform(transform);
+            _centreLine.Transform(transform);
             CurveGeometry.Transform(transform);
             _extrudedProfile.Transform(transform);
         }
@@ -94,10 +94,16 @@ namespace CustomExtrudedProfile
 
         private Brep CreateExtrudedProfile(double width, double height)
         {
-            Plane pl = new Plane(_centreline.From, _centreline.Direction);
+            Plane pl = new Plane(_centreLine.From, _centreLine.Direction);
             Rectangle3d rec = new Rectangle3d(pl, width, height);
             Brep[] planarBrep = Brep.CreatePlanarBreps(rec.ToNurbsCurve(), Rhino.RhinoMath.ZeroTolerance);
-            return planarBrep.First().Faces.First().CreateExtrusion(_centreline.ToNurbsCurve(), true);
+            return planarBrep.First().Faces.First().CreateExtrusion(_centreLine.ToNurbsCurve(), true);
         }
+
+        public void UpdateExtrudedProfile()
+        {
+            _extrudedProfile = CreateExtrudedProfile(Width, Height);
+        }
+
     }
 }
