@@ -1,6 +1,5 @@
 ﻿using Rhino;
 using Rhino.Commands;
-using Rhino.Display;
 using Rhino.DocObjects;
 using Rhino.Geometry;
 using Rhino.PlugIns;
@@ -24,7 +23,6 @@ namespace CustomObject.PlugIn
             RhinoDoc.ModifyObjectAttributes += OnModifyObjectAttributes;
             RhinoDoc.BeforeTransformObjects += OnBeforeTransformObjects;
             Command.EndCommand += EndCommand;
-            DisplayPipeline.CalculateBoundingBox += AddBBox;
         }
 
         ///<summary>Gets the only instance of the RhinoCommonTestPlugIn plug-in.</summary>
@@ -43,11 +41,11 @@ namespace CustomObject.PlugIn
         {
         }
 
-        public void OnBeforeTransformObjects(object sender, RhinoTransformObjectsEventArgs e)
+        private void OnBeforeTransformObjects(object sender, RhinoTransformObjectsEventArgs e)
         {
             foreach (RhinoObject rhinoObject in e.GripOwners)
             {
-                if (!(rhinoObject is CustomGeo customGeo)) return;
+                if (!(rhinoObject is CustomGeo customGeo)) continue;
 
                 var grips = customGeo.GetGrips();
                 foreach (GripObject grip in grips)
@@ -67,13 +65,13 @@ namespace CustomObject.PlugIn
             }
         }
 
-        public void EndCommand(object sender, CommandEventArgs e)
+        private void EndCommand(object sender, CommandEventArgs e)
         {
             var doc = e.Document;
             var objs = doc.Objects.FindByObjectType(ObjectType.Curve);
             foreach (RhinoObject rhinoObject in objs)
             {
-                if (!(rhinoObject.Geometry is Curve crv)) return;
+                if (!(rhinoObject.Geometry is Curve crv)) continue;
                 Line datumLine = new Line(crv.PointAtStart, crv.PointAtEnd);
                 double width = double.Parse(rhinoObject.Attributes.GetUserString("Width"));
                 double height = double.Parse(rhinoObject.Attributes.GetUserString("Height"));
@@ -81,17 +79,6 @@ namespace CustomObject.PlugIn
                 ObjRef geoRef = new ObjRef(rhinoObject);
                 CustomGeo geo = new CustomGeo(datumLine, width, height);
                 _ = doc.Objects.Replace(geoRef, geo);
-            }
-        }
-
-        public void AddBBox(object sender, CalculateBoundingBoxEventArgs e)
-        {
-            var objs = e.RhinoDoc.Objects.FindByObjectType(ObjectType.Curve);
-            foreach (RhinoObject rhinoObject in objs)
-            {
-                if (!(rhinoObject is CustomGeo customGeo)) return;
-
-                e.IncludeBoundingBox(customGeo.bBox);
             }
         }
     }
