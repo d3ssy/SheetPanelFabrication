@@ -1,11 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿
 using Rhino;
-using Rhino.Commands;
 using Rhino.DocObjects;
 using Rhino.Geometry;
-using Rhino.PlugIns;
 
-namespace CustomObject.PlugIn
+namespace CustomExtrudedProfile
 {
     ///<summary>
     /// <para>Every RhinoCommon .rhp assembly must have one and only one PlugIn-derived
@@ -15,9 +13,10 @@ namespace CustomObject.PlugIn
     /// attributes in AssemblyInfo.cs (you might need to click "Project" ->
     /// "Show All Files" to see it in the "Solution Explorer" window).</para>
     ///</summary>
-    public class CreatesExtrusionPlugIn : Rhino.PlugIns.PlugIn
+    public class CustomExtrudedProfilePlugIn : Rhino.PlugIns.PlugIn
+
     {
-        public CreatesExtrusionPlugIn()
+        public CustomExtrudedProfilePlugIn()
         {
             Instance = this;
             RhinoDoc.ModifyObjectAttributes += OnModifyObjectAttributes;
@@ -27,7 +26,11 @@ namespace CustomObject.PlugIn
 
         ///<summary>Gets the only instance of the RhinoCommonTestPlugIn plug-in.</summary>
         public static CreatesExtrusionPlugIn Instance { get; private set; }
-        public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
+
+        protected override LoadReturnCode OnLoad(ref string errorMessage)
+        {
+            return LoadReturnCode.Success;
+        }
 
         // You can override methods here to change the plug-in behavior on
         // loading and shut down, add options pages to the Rhino _Option command
@@ -60,7 +63,7 @@ namespace CustomObject.PlugIn
                 }
             }
         }
-        
+
         private void ReplaceRhinoObject(object sender, RhinoReplaceObjectEventArgs e)
         {
             if (!(e.OldRhinoObject is CustomGeo)) return;
