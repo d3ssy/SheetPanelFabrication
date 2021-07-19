@@ -8,7 +8,7 @@ using System.Drawing;
 using System.Linq;
 using Rhino.UI.Controls;
 
-namespace CustomObject.PlugIn
+namespace CustomExtrudedProfile
 {
     public class CustomGeo : CustomCurveObject
     {
