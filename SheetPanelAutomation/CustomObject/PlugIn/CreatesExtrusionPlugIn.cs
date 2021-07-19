@@ -23,7 +23,7 @@ namespace CustomObject.PlugIn
             Instance = this;
             RhinoDoc.ModifyObjectAttributes += OnModifyObjectAttributes;
             RhinoDoc.BeforeTransformObjects += OnBeforeTransformObjects;
-            Command.EndCommand += EndCommand;
+            RhinoDoc.ReplaceRhinoObject += ReplaceRhinoObject;
         }
 
         ///<summary>Gets the only instance of the RhinoCommonTestPlugIn plug-in.</summary>
@@ -65,22 +65,17 @@ namespace CustomObject.PlugIn
                 }
             }
         }
-
-        private void EndCommand(object sender, CommandEventArgs e)
+        
+        private void ReplaceRhinoObject(object sender, RhinoReplaceObjectEventArgs e)
         {
-            var doc = e.Document;
-            var objs = doc.Objects.FindByObjectType(ObjectType.Curve);
-            foreach (RhinoObject rhinoObject in objs)
-            {
-                if (!(rhinoObject.Geometry is Curve crv)) continue;
-                Line datumLine = new Line(crv.PointAtStart, crv.PointAtEnd);
-                double width = double.Parse(rhinoObject.Attributes.GetUserString("Width"));
-                double height = double.Parse(rhinoObject.Attributes.GetUserString("Height"));
-
-                ObjRef geoRef = new ObjRef(rhinoObject);
-                CustomGeo geo = new CustomGeo(datumLine, width, height);
-                _ = doc.Objects.Replace(geoRef, geo);
-            }
+            if (!(e.OldRhinoObject is CustomGeo)) return;
+            var newLine = e.NewRhinoObject.Geometry as Curve;
+            double width = double.Parse(e.OldRhinoObject.Attributes.GetUserString("Width"));
+            double height = double.Parse(e.OldRhinoObject.Attributes.GetUserString("Height"));
+            CustomGeo customObject = new CustomGeo(new Line(newLine.PointAtStart, newLine.PointAtEnd), width, height);
+            ObjRef geoRef = new ObjRef(e.OldRhinoObject);
+            e.Document.Objects.Delete(geoRef, true, false);
+            e.Document.Objects.AddRhinoObject(customObject, null);
         }
     }
 }

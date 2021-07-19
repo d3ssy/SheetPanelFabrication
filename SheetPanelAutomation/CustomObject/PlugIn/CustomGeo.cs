@@ -76,7 +76,7 @@ namespace CustomObject.PlugIn
                 _extrudedProfile = src._extrudedProfile;
                 Attributes.SetUserString("Width", src.Width.ToString());
                 Attributes.SetUserString("Height", src.Height.ToString());
-                SetCurve(src.Centreline.ToNurbsCurve());
+                SetCurve(src._centreline.ToNurbsCurve());
             }
         }
         protected override void OnTransform(Transform transform)
