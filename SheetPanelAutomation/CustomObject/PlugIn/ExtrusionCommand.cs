@@ -11,7 +11,7 @@ using Rhino.Input;
 
 namespace CustomObject.PlugIn
 {
-    [Guid("DC72A496-E674-4547-A5CE-9D1FE75B414E")]
+    [Guid("61055a13-cd6d-4c5d-8978-0ee9a0560837")]
     public class ExtrusionCommand : Command
     {
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)

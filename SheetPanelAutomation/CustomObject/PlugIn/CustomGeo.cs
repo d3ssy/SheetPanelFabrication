@@ -1,12 +1,11 @@
-﻿using System;
-using Rhino;
+﻿using Rhino;
 using Rhino.Display;
 using Rhino.DocObjects;
 using Rhino.DocObjects.Custom;
 using Rhino.Geometry;
+using System;
 using System.Drawing;
 using System.Linq;
-using Rhino.UI.Controls;
 
 namespace CustomObject.PlugIn
 {
@@ -36,7 +35,7 @@ namespace CustomObject.PlugIn
             set
             {
                 if (!value.IsValid) throw new ArgumentException("Line is not valid.", nameof(Centreline));
-                
+
                 _centreline = value;
                 _extrudedProfile = CreateExtrudedProfile(Width, Height);
             }

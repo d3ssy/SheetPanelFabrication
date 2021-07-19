@@ -15,7 +15,6 @@ namespace CustomObject.PlugIn
     /// attributes in AssemblyInfo.cs (you might need to click "Project" ->
     /// "Show All Files" to see it in the "Solution Explorer" window).</para>
     ///</summary>
-    [Guid("61055a13-cd6d-4c5d-8978-0ee9a0560837")]
     public class CreatesExtrusionPlugIn : Rhino.PlugIns.PlugIn
     {
         public CreatesExtrusionPlugIn()
@@ -28,11 +27,7 @@ namespace CustomObject.PlugIn
 
         ///<summary>Gets the only instance of the RhinoCommonTestPlugIn plug-in.</summary>
         public static CreatesExtrusionPlugIn Instance { get; private set; }
-
-        protected override LoadReturnCode OnLoad(ref string errorMessage)
-        {
-            return LoadReturnCode.Success;
-        }
+        public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
 
         // You can override methods here to change the plug-in behavior on
         // loading and shut down, add options pages to the Rhino _Option command
