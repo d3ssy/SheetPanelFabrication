@@ -1,4 +1,5 @@
-﻿using Rhino;
+﻿using System.Runtime.InteropServices;
+using Rhino;
 using Rhino.Commands;
 using Rhino.DocObjects;
 using Rhino.Geometry;
@@ -14,7 +15,7 @@ namespace CustomObject.PlugIn
     /// attributes in AssemblyInfo.cs (you might need to click "Project" ->
     /// "Show All Files" to see it in the "Solution Explorer" window).</para>
     ///</summary>
-    [System.Runtime.InteropServices.Guid("61055a13-cd6d-4c5d-8978-0ee9a0560837")]
+    [Guid("61055a13-cd6d-4c5d-8978-0ee9a0560837")]
     public class CreatesExtrusionPlugIn : Rhino.PlugIns.PlugIn
     {
         public CreatesExtrusionPlugIn()
@@ -50,15 +51,15 @@ namespace CustomObject.PlugIn
                 var grips = customGeo.GetGrips();
                 foreach (GripObject grip in grips)
                 {
-                    if (grip.OriginalLocation == customGeo.DatumLine.From)
+                    if (grip.OriginalLocation == customGeo.Centreline.From)
                     {
-                        customGeo.DatumLine.From = grip.CurrentLocation;
+                        customGeo.Centreline = new Line(grip.CurrentLocation, customGeo.Centreline.To);
                         RhinoApp.WriteLine($"Transformed the start point -> {grip.CurrentLocation}");
                     }
 
-                    if (grip.OriginalLocation == customGeo.DatumLine.To)
+                    if (grip.OriginalLocation == customGeo.Centreline.To)
                     {
-                        customGeo.DatumLine.To = grip.CurrentLocation;
+                        customGeo.Centreline = new Line(customGeo.Centreline.From, grip.CurrentLocation);
                         RhinoApp.WriteLine($"Transformed the end point -> {grip.CurrentLocation}");
                     }
                 }

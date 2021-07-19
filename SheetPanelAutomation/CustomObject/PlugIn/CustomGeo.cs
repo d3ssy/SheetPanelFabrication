@@ -5,20 +5,48 @@ using Rhino.DocObjects;
 using Rhino.DocObjects.Custom;
 using Rhino.Geometry;
 using System.Drawing;
+using System.Linq;
+using Rhino.UI.Controls;
 
 namespace CustomObject.PlugIn
 {
     public class CustomGeo : CustomCurveObject
     {
-        private double Width => double.Parse(this.Attributes.GetUserString("Width"));
+        private Line _centreline;
 
-        private double Height => double.Parse(this.Attributes.GetUserString("Height"));
+        private Brep _extrudedProfile;
 
-        public Line DatumLine;
+        public CustomGeo()
+        {
+            DisplayPipeline.CalculateBoundingBox += AddBBox;
+        }
 
-        private Brep Box => CreateBrep();
+        public CustomGeo(Line centreline, double width, double height) : base(centreline.ToNurbsCurve())
+        {
+            _centreline = centreline;
+            Attributes.SetUserString("Width", width.ToString());
+            Attributes.SetUserString("Height", height.ToString());
+            _extrudedProfile = CreateExtrudedProfile(width, height);
+            DisplayPipeline.CalculateBoundingBox += AddBBox;
+        }
 
-        private DisplayMaterial material
+        public Line Centreline
+        {
+            get => _centreline;
+            set
+            {
+                if (!value.IsValid) throw new ArgumentException("Line is not valid.", nameof(Centreline));
+                
+                _centreline = value;
+                _extrudedProfile = CreateExtrudedProfile(Width, Height);
+            }
+        }
+
+        private double Width => double.Parse(Attributes.GetUserString("Width"));
+
+        private double Height => double.Parse(Attributes.GetUserString("Height"));
+
+        private static DisplayMaterial Material
         {
             get
             {
@@ -29,59 +57,47 @@ namespace CustomObject.PlugIn
             }
         }
 
-        public CustomGeo() : base()
-        {
-            DisplayPipeline.CalculateBoundingBox += AddBBox;
-        }
-
-        public CustomGeo(Line datumLine, double width, double height) : base(datumLine.ToNurbsCurve())
-        {
-            DatumLine = datumLine;
-            Attributes.SetUserString("Width", width.ToString());
-            Attributes.SetUserString("Height", height.ToString());
-            DisplayPipeline.CalculateBoundingBox += AddBBox;
-        }
-
         protected override void OnDraw(Rhino.Display.DrawEventArgs e)
         {
             base.OnDraw(e);
             if (this.IsSelected(false) < 0) return;
 
-            e.Display.DrawBrepWires(Box, Attributes.DrawColor(e.RhinoDoc), Attributes.WireDensity);
-            e.Display.DrawBrepShaded(Box, material);
+            e.Display.DrawBrepWires(_extrudedProfile, Attributes.DrawColor(e.RhinoDoc), Attributes.WireDensity);
+            e.Display.DrawBrepShaded(_extrudedProfile, Material);
         }
 
         protected override void OnDuplicate(RhinoObject source)
         {
             RhinoApp.WriteLine("OnDuplicate");
             base.OnDuplicate(source);
-            if (source is CustomGeo rhe)
+            if (source is CustomGeo src)
             {
-                DatumLine = rhe.DatumLine;
-                Attributes.SetUserString("Width", rhe.Width.ToString());
-                Attributes.SetUserString("Height", rhe.Height.ToString());
-                SetCurve(rhe.DatumLine.ToNurbsCurve());
+                _centreline = src._centreline;
+                _extrudedProfile = src._extrudedProfile;
+                Attributes.SetUserString("Width", src.Width.ToString());
+                Attributes.SetUserString("Height", src.Height.ToString());
+                SetCurve(src.Centreline.ToNurbsCurve());
             }
         }
         protected override void OnTransform(Transform transform)
         {
             RhinoApp.WriteLine("OnTransform");
             base.OnTransform(transform);
-            DatumLine.Transform(transform);
+            Centreline.Transform(transform);
             CurveGeometry.Transform(transform);
         }
 
         public void AddBBox(object sender, CalculateBoundingBoxEventArgs e)
         {
-            e.IncludeBoundingBox(Box.GetBoundingBox(false));
+            e.IncludeBoundingBox(_extrudedProfile.GetBoundingBox(false));
         }
 
-        private Brep CreateBrep()
+        private Brep CreateExtrudedProfile(double width, double height)
         {
-            Plane pl = new Plane(DatumLine.From, DatumLine.Direction);
-            Rectangle3d rec = new Rectangle3d(pl, Width, Height);
+            Plane pl = new Plane(_centreline.From, _centreline.Direction);
+            Rectangle3d rec = new Rectangle3d(pl, width, height);
             Brep[] planarBrep = Brep.CreatePlanarBreps(rec.ToNurbsCurve(), Rhino.RhinoMath.ZeroTolerance);
-            return planarBrep[0].Faces[0].CreateExtrusion(DatumLine.ToNurbsCurve(), true);
+            return planarBrep.First().Faces.First().CreateExtrusion(_centreline.ToNurbsCurve(), true);
         }
     }
 }
