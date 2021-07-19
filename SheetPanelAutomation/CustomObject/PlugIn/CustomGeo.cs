@@ -73,7 +73,7 @@ namespace CustomObject.PlugIn
             if (source is CustomGeo src)
             {
                 _centreline = src._centreline;
-                _extrudedProfile = src._extrudedProfile;
+                _extrudedProfile = src._extrudedProfile.DuplicateBrep();
                 Attributes.SetUserString("Width", src.Width.ToString());
                 Attributes.SetUserString("Height", src.Height.ToString());
                 SetCurve(src._centreline.ToNurbsCurve());
@@ -83,8 +83,9 @@ namespace CustomObject.PlugIn
         {
             RhinoApp.WriteLine("OnTransform");
             base.OnTransform(transform);
-            Centreline.Transform(transform);
+            _centreline.Transform(transform);
             CurveGeometry.Transform(transform);
+            _extrudedProfile.Transform(transform);
         }
 
         public void AddBBox(object sender, CalculateBoundingBoxEventArgs e)
