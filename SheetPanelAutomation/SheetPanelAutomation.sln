@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomObjectExtrudedProfile
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomUserDataWithConduit", "CustomUserDataWithConduit\CustomUserDataWithConduit.csproj", "{DF51AD39-5280-4288-B6ED-D7AFDE96F98A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomObjectAssociatedToBakedObjects", "CustomObjectAssociatedToBakedObjects\CustomObjectAssociatedToBakedObjects.csproj", "{12E58EB4-C711-4CD7-A6C1-57D79614A465}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		SheetPanelAutomation.Core\SheetPanelAutomation.Core.projitems*{0d4953bb-a106-4643-be33-e9bb6b05bd16}*SharedItemsImports = 13
@@ -40,6 +42,10 @@ Global
 		{DF51AD39-5280-4288-B6ED-D7AFDE96F98A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF51AD39-5280-4288-B6ED-D7AFDE96F98A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF51AD39-5280-4288-B6ED-D7AFDE96F98A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12E58EB4-C711-4CD7-A6C1-57D79614A465}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12E58EB4-C711-4CD7-A6C1-57D79614A465}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12E58EB4-C711-4CD7-A6C1-57D79614A465}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12E58EB4-C711-4CD7-A6C1-57D79614A465}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
