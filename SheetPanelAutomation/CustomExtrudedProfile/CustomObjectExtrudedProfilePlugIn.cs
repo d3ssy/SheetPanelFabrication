@@ -14,10 +14,10 @@ namespace CustomExtrudedProfile
     /// attributes in AssemblyInfo.cs (you might need to click "Project" ->
     /// "Show All Files" to see it in the "Solution Explorer" window).</para>
     ///</summary>
-    public class CustomExtrudedProfilePlugIn : Rhino.PlugIns.PlugIn
+    public class CustomObjectExtrudedProfilePlugIn : Rhino.PlugIns.PlugIn
 
     {
-        public CustomExtrudedProfilePlugIn()
+        public CustomObjectExtrudedProfilePlugIn()
         {
             Instance = this;
             RhinoDoc.ModifyObjectAttributes += OnModifyObjectAttributes;
@@ -26,7 +26,7 @@ namespace CustomExtrudedProfile
         }
 
         ///<summary>Gets the only instance of the RhinoCommonTestPlugIn plug-in.</summary>
-        public static CustomExtrudedProfilePlugIn Instance { get; private set; }
+        public static CustomObjectExtrudedProfilePlugIn Instance { get; private set; }
 
         public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
         protected override LoadReturnCode OnLoad(ref string errorMessage)
@@ -40,7 +40,7 @@ namespace CustomExtrudedProfile
 
         private void OnModifyObjectAttributes(object sender, RhinoModifyObjectAttributesEventArgs e)
         {
-            if (!(e.RhinoObject is CustomGeo customGeo)) return;
+            if (!(e.RhinoObject is CustomExtrudedProfileObject customGeo)) return;
             customGeo.UpdateExtrudedProfile();
         }
 
@@ -48,7 +48,7 @@ namespace CustomExtrudedProfile
         {
             foreach (RhinoObject rhinoObject in e.GripOwners)
             {
-                if (!(rhinoObject is CustomGeo customGeo)) continue;
+                if (!(rhinoObject is CustomExtrudedProfileObject customGeo)) continue;
 
                 var grips = customGeo.GetGrips();
                 foreach (GripObject grip in grips)
@@ -70,11 +70,11 @@ namespace CustomExtrudedProfile
 
         private void ReplaceRhinoObject(object sender, RhinoReplaceObjectEventArgs e)
         {
-            if (!(e.OldRhinoObject is CustomGeo)) return;
+            if (!(e.OldRhinoObject is CustomExtrudedProfileObject)) return;
             var newLine = e.NewRhinoObject.Geometry as Curve;
             double width = double.Parse(e.OldRhinoObject.Attributes.GetUserString("Width"));
             double height = double.Parse(e.OldRhinoObject.Attributes.GetUserString("Height"));
-            CustomGeo customObject = new CustomGeo(new Line(newLine.PointAtStart, newLine.PointAtEnd), width, height);
+            CustomExtrudedProfileObject customObject = new CustomExtrudedProfileObject(new Line(newLine.PointAtStart, newLine.PointAtEnd), width, height);
             ObjRef geoRef = new ObjRef(e.OldRhinoObject);
             e.Document.Objects.Delete(geoRef, true, false);
             e.Document.Objects.AddRhinoObject(customObject, null);

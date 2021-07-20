@@ -9,7 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SheetPanelAutomation.Rhino"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SheetPanelAutomation.Core", "SheetPanelAutomation.Core\SheetPanelAutomation.Core.shproj", "{0D4953BB-A106-4643-BE33-E9BB6B05BD16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomExtrudedProfile", "CustomExtrudedProfile\CustomExtrudedProfile.csproj", "{5329D0A7-E28E-4FA2-8245-0C05FD9F8358}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomObjectExtrudedProfile", "CustomExtrudedProfile\CustomObjectExtrudedProfile.csproj", "{5329D0A7-E28E-4FA2-8245-0C05FD9F8358}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomUserDataWithConduit", "CustomUserDataWithConduit\CustomUserDataWithConduit.csproj", "{DF51AD39-5280-4288-B6ED-D7AFDE96F98A}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -34,6 +36,10 @@ Global
 		{5329D0A7-E28E-4FA2-8245-0C05FD9F8358}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5329D0A7-E28E-4FA2-8245-0C05FD9F8358}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5329D0A7-E28E-4FA2-8245-0C05FD9F8358}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF51AD39-5280-4288-B6ED-D7AFDE96F98A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF51AD39-5280-4288-B6ED-D7AFDE96F98A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF51AD39-5280-4288-B6ED-D7AFDE96F98A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF51AD39-5280-4288-B6ED-D7AFDE96F98A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

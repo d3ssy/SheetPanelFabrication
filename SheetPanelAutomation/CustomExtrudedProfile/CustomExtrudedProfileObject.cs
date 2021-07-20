@@ -9,18 +9,18 @@ using System.Linq;
 
 namespace CustomExtrudedProfile
 {
-    public class CustomGeo : CustomCurveObject
+    public class CustomExtrudedProfileObject : CustomCurveObject
     {
         private Line _centreLine;
 
         private Brep _extrudedProfile;
 
-        public CustomGeo()
+        public CustomExtrudedProfileObject()
         {
             DisplayPipeline.CalculateBoundingBox += AddBBox;
         }
 
-        public CustomGeo(Line centreLine, double width, double height) : base(centreLine.ToNurbsCurve())
+        public CustomExtrudedProfileObject(Line centreLine, double width, double height) : base(centreLine.ToNurbsCurve())
         {
             _centreLine = centreLine;
             Attributes.SetUserString("Width", width.ToString());
@@ -69,7 +69,7 @@ namespace CustomExtrudedProfile
         {
             RhinoApp.WriteLine("OnDuplicate");
             base.OnDuplicate(source);
-            if (source is CustomGeo src)
+            if (source is CustomExtrudedProfileObject src)
             {
                 _centreLine = src._centreLine;
                 _extrudedProfile = src._extrudedProfile.DuplicateBrep();

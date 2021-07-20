@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{5329D0A7-E28E-4FA2-8245-0C05FD9F8358}</ProjectGuid>
+    <ProjectGuid>{DF51AD39-5280-4288-B6ED-D7AFDE96F98A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CustomExtrudedProfile</RootNamespace>
-    <AssemblyName>CustomExtrudedProfile</AssemblyName>
+    <RootNamespace>RhinoPlugin_00</RootNamespace>
+    <AssemblyName>RhinoPlugin_00</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -54,10 +54,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomExtrudedProfileCommand.cs" />
-    <Compile Include="CustomExtrudedProfilePlugIn.cs" />
-    <Compile Include="CustomGeo.cs" />
+    <Compile Include="ExtrusionProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CreateExtrudedProfileWithCustomUserDataCommand.cs" />
+    <Compile Include="CustomUserDataConduit.cs" />
+    <Compile Include="CustomUserDataWithConduitPlugIn.cs" />
+    <Compile Include="CustomUserData.cs" />
+    <Compile Include="ToggleCustomUserDataConduit.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\plugin-utility.ico" />

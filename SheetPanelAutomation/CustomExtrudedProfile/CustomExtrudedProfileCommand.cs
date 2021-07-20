@@ -28,13 +28,13 @@ namespace CustomExtrudedProfile
         ///<returns>The command name as it appears on the Rhino command line.</returns>
         public override string EnglishName
         {
-            get { return "CreateCustomExtrudedProfile"; }
+            get { return "CreateCustomExtrudedProfileWithCustomObject"; }
         }
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
             RhinoGet.GetLine(out Line line);
-            var geo = new CustomGeo(line, 10, 10);
+            var geo = new CustomExtrudedProfileObject(line, 10, 10);
             doc.Objects.AddRhinoObject(geo, null);
 
             return Result.Success;
