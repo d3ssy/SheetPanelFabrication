@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="CustomObjectAssociatedToBakedObjectsCommand.cs" />
     <Compile Include="CustomObjectAssociatedToBakedObjectsPlugIn.cs" />
+    <Compile Include="CustomObjectAssociateToBakedObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
