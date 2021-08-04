@@ -22,6 +22,7 @@ namespace CustomObjectAssociatedToBakedObjects
             RhinoDoc.ModifyObjectAttributes += OnModifyObjectAttributes;
             RhinoDoc.BeforeTransformObjects += OnBeforeTransformObjects;
             RhinoDoc.ReplaceRhinoObject += ReplaceRhinoObject;
+            RhinoDoc.AddRhinoObject += AddBox;
         }
 
         ///<summary>Gets the only instance of the RhinoCommonTestPlugIn plug-in.</summary>
@@ -76,9 +77,15 @@ namespace CustomObjectAssociatedToBakedObjects
             double height = double.Parse(e.OldRhinoObject.Attributes.GetUserString("Height"));
             CustomObjectAssociateToBakedObject customObject = new CustomObjectAssociateToBakedObject(new Line(newLine.PointAtStart, newLine.PointAtEnd), width, height);
             ObjRef geoRef = new ObjRef(e.OldRhinoObject);
-            e.Document.Objects.Delete(geoRef, true, false);
             e.Document.Objects.Delete(oldObj._objId, true);
+            e.Document.Objects.Delete(geoRef, true, false);
             e.Document.Objects.AddRhinoObject(customObject, null);
+        }
+
+        private void AddBox(object sender, RhinoObjectEventArgs e)
+        {
+            if (!(e.TheObject is CustomObjectAssociateToBakedObject customGeo)) return;
+            customGeo._objId = e.TheObject.Document.Objects.AddBrep(customGeo._extrudedProfile, null);
         }
     }
 }

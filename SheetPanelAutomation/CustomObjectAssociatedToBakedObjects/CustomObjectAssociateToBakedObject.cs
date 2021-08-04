@@ -13,7 +13,7 @@ namespace CustomObjectAssociatedToBakedObjects
     {
         private Line _centreLine;
 
-        private Brep _extrudedProfile;
+        public Brep _extrudedProfile;
 
         public Guid _objId;
 
@@ -28,7 +28,6 @@ namespace CustomObjectAssociatedToBakedObjects
             Attributes.SetUserString("Width", width.ToString());
             Attributes.SetUserString("Height", height.ToString());
             _extrudedProfile = CreateExtrudedProfile(width, height);
-            AddBox(_extrudedProfile);
             DisplayPipeline.CalculateBoundingBox += AddBBox;
         }
 
@@ -68,7 +67,6 @@ namespace CustomObjectAssociatedToBakedObjects
                 Attributes.SetUserString("Width", src.Width.ToString());
                 Attributes.SetUserString("Height", src.Height.ToString());
                 SetCurve(src._centreLine.ToNurbsCurve());
-                AddBox(_extrudedProfile);
             }
         }
         protected override void OnTransform(Transform transform)
