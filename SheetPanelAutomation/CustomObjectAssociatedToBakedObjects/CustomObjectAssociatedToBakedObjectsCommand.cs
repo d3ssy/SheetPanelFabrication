@@ -2,9 +2,6 @@
 using Rhino.Commands;
 using Rhino.Geometry;
 using Rhino.Input;
-using Rhino.Input.Custom;
-using System;
-using System.Collections.Generic;
 
 namespace CustomObjectAssociatedToBakedObjects
 {
@@ -33,7 +30,7 @@ namespace CustomObjectAssociatedToBakedObjects
         {
             RhinoGet.GetLine(out Line line);
             var geo = new CustomObjectAssociateToBakedObject(line, 10, 10);
-            doc.Objects.AddBrep(geo.ExtrudedProfile, null);
+            doc.Objects.AddRhinoObject(geo, null);
 
             return Result.Success;
         }

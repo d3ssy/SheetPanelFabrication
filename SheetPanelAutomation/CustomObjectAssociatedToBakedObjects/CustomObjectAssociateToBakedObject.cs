@@ -13,7 +13,9 @@ namespace CustomObjectAssociatedToBakedObjects
     {
         private Line _centreLine;
 
-        public Brep ExtrudedProfile;
+        private Brep _extrudedProfile;
+
+        public Guid _objId;
 
         public CustomObjectAssociateToBakedObject()
         {
@@ -25,7 +27,8 @@ namespace CustomObjectAssociatedToBakedObjects
             _centreLine = centreLine;
             Attributes.SetUserString("Width", width.ToString());
             Attributes.SetUserString("Height", height.ToString());
-            ExtrudedProfile = CreateExtrudedProfile(width, height);
+            _extrudedProfile = CreateExtrudedProfile(width, height);
+            AddBox(_extrudedProfile);
             DisplayPipeline.CalculateBoundingBox += AddBBox;
         }
 
@@ -37,7 +40,7 @@ namespace CustomObjectAssociatedToBakedObjects
                 if (!value.IsValid) throw new ArgumentException("Line is not valid.", nameof(CentreLine));
 
                 _centreLine = value;
-                ExtrudedProfile = CreateExtrudedProfile(Width, Height);
+                _extrudedProfile = CreateExtrudedProfile(Width, Height);
             }
         }
 
@@ -50,6 +53,7 @@ namespace CustomObjectAssociatedToBakedObjects
             base.OnDraw(e);
             if (this.IsSelected(false) < 0) return;
 
+            e.RhinoDoc.Views.Redraw();
             e.Display.DrawDottedLine(_centreLine, Color.FromArgb(230, 180, 60));
         }
 
@@ -60,10 +64,11 @@ namespace CustomObjectAssociatedToBakedObjects
             if (source is CustomObjectAssociateToBakedObject src)
             {
                 _centreLine = src._centreLine;
-                ExtrudedProfile = src.ExtrudedProfile.DuplicateBrep();
+                _extrudedProfile = src._extrudedProfile.DuplicateBrep();
                 Attributes.SetUserString("Width", src.Width.ToString());
                 Attributes.SetUserString("Height", src.Height.ToString());
                 SetCurve(src._centreLine.ToNurbsCurve());
+                AddBox(_extrudedProfile);
             }
         }
         protected override void OnTransform(Transform transform)
@@ -72,12 +77,28 @@ namespace CustomObjectAssociatedToBakedObjects
             base.OnTransform(transform);
             _centreLine.Transform(transform);
             CurveGeometry.Transform(transform);
-            ExtrudedProfile.Transform(transform);
+            _extrudedProfile.Transform(transform);
+            UpdateBox(_extrudedProfile);
         }
 
         public void AddBBox(object sender, CalculateBoundingBoxEventArgs e)
         {
-            e.IncludeBoundingBox(ExtrudedProfile.GetBoundingBox(false));
+            e.IncludeBoundingBox(_extrudedProfile.GetBoundingBox(false));
+        }
+
+        private void AddBox(Brep box)
+        {
+            RhinoDoc doc = RhinoDoc.ActiveDoc;
+
+            if (doc == null) return;
+            _objId = doc.Objects.AddBrep(box);
+        }
+
+        private void UpdateBox(Brep box)
+        {
+            RhinoDoc doc = RhinoDoc.ActiveDoc;
+            if (doc == null) return;
+            doc.Objects.Replace(_objId, box);
         }
 
         private Brep CreateExtrudedProfile(double width, double height)
@@ -90,7 +111,8 @@ namespace CustomObjectAssociatedToBakedObjects
 
         public void UpdateExtrudedProfile()
         {
-            ExtrudedProfile = CreateExtrudedProfile(Width, Height);
+            _extrudedProfile = CreateExtrudedProfile(Width, Height);
+            UpdateBox(_extrudedProfile);
         }
     }
 }

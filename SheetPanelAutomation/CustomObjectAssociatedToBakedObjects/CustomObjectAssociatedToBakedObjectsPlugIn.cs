@@ -70,12 +70,14 @@ namespace CustomObjectAssociatedToBakedObjects
         private void ReplaceRhinoObject(object sender, RhinoReplaceObjectEventArgs e)
         {
             if (!(e.OldRhinoObject is CustomObjectAssociateToBakedObject)) return;
+            var oldObj = e.OldRhinoObject as CustomObjectAssociateToBakedObject;
             var newLine = e.NewRhinoObject.Geometry as Curve;
             double width = double.Parse(e.OldRhinoObject.Attributes.GetUserString("Width"));
             double height = double.Parse(e.OldRhinoObject.Attributes.GetUserString("Height"));
             CustomObjectAssociateToBakedObject customObject = new CustomObjectAssociateToBakedObject(new Line(newLine.PointAtStart, newLine.PointAtEnd), width, height);
             ObjRef geoRef = new ObjRef(e.OldRhinoObject);
             e.Document.Objects.Delete(geoRef, true, false);
+            e.Document.Objects.Delete(oldObj._objId, true);
             e.Document.Objects.AddRhinoObject(customObject, null);
         }
     }
