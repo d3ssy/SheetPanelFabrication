@@ -1,5 +1,6 @@
 ﻿using Rhino.DocObjects.Custom;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Rhino;
@@ -13,9 +14,11 @@ namespace CustomObjectAssociatedToBakedObjects
     {
         private Line _centreLine;
 
-        public Brep _extrudedProfile;
+        public Brep ExtrudedProfile;
 
-        public Guid _objId;
+        public Guid ObjId;
+
+        private List<Curve> _dashedCurves;
 
         public CustomObjectAssociateToBakedObject()
         {
@@ -27,7 +30,8 @@ namespace CustomObjectAssociatedToBakedObjects
             _centreLine = centreLine;
             Attributes.SetUserString("Width", width.ToString());
             Attributes.SetUserString("Height", height.ToString());
-            _extrudedProfile = CreateExtrudedProfile(width, height);
+            ExtrudedProfile = CreateExtrudedProfile(width, height);
+            ApplyDashPattern(centreLine.ToNurbsCurve(), new[] {1.0});
             DisplayPipeline.CalculateBoundingBox += AddBBox;
         }
 
@@ -39,7 +43,8 @@ namespace CustomObjectAssociatedToBakedObjects
                 if (!value.IsValid) throw new ArgumentException("Line is not valid.", nameof(CentreLine));
 
                 _centreLine = value;
-                _extrudedProfile = CreateExtrudedProfile(Width, Height);
+                ExtrudedProfile = CreateExtrudedProfile(Width, Height);
+                ApplyDashPattern(_centreLine.ToNurbsCurve(), new[] { 1.0 });
             }
         }
 
@@ -47,13 +52,13 @@ namespace CustomObjectAssociatedToBakedObjects
 
         private double Height => double.Parse(Attributes.GetUserString("Height"));
 
-        protected override void OnDraw(Rhino.Display.DrawEventArgs e)
+        protected override void OnDraw(DrawEventArgs e)
         {
             base.OnDraw(e);
             if (this.IsSelected(false) < 0) return;
 
             e.RhinoDoc.Views.Redraw();
-            e.Display.DrawDottedLine(_centreLine, Color.FromArgb(230, 180, 60));
+            _dashedCurves.ForEach(c => e.Display.DrawCurve(c, Color.FromArgb(230, 180, 60), 5));
         }
 
         protected override void OnDuplicate(RhinoObject source)
@@ -63,7 +68,7 @@ namespace CustomObjectAssociatedToBakedObjects
             if (source is CustomObjectAssociateToBakedObject src)
             {
                 _centreLine = src._centreLine;
-                _extrudedProfile = src._extrudedProfile.DuplicateBrep();
+                ExtrudedProfile = src.ExtrudedProfile.DuplicateBrep();
                 Attributes.SetUserString("Width", src.Width.ToString());
                 Attributes.SetUserString("Height", src.Height.ToString());
                 SetCurve(src._centreLine.ToNurbsCurve());
@@ -75,28 +80,20 @@ namespace CustomObjectAssociatedToBakedObjects
             base.OnTransform(transform);
             _centreLine.Transform(transform);
             CurveGeometry.Transform(transform);
-            _extrudedProfile.Transform(transform);
-            UpdateBox(_extrudedProfile);
+            ExtrudedProfile.Transform(transform);
+            UpdateBox(ExtrudedProfile);
         }
 
         public void AddBBox(object sender, CalculateBoundingBoxEventArgs e)
         {
-            e.IncludeBoundingBox(_extrudedProfile.GetBoundingBox(false));
-        }
-
-        private void AddBox(Brep box)
-        {
-            RhinoDoc doc = RhinoDoc.ActiveDoc;
-
-            if (doc == null) return;
-            _objId = doc.Objects.AddBrep(box);
+            e.IncludeBoundingBox(ExtrudedProfile.GetBoundingBox(false));
         }
 
         private void UpdateBox(Brep box)
         {
             RhinoDoc doc = RhinoDoc.ActiveDoc;
             if (doc == null) return;
-            doc.Objects.Replace(_objId, box);
+            doc.Objects.Replace(ObjId, box);
         }
 
         private Brep CreateExtrudedProfile(double width, double height)
@@ -109,8 +106,58 @@ namespace CustomObjectAssociatedToBakedObjects
 
         public void UpdateExtrudedProfile()
         {
-            _extrudedProfile = CreateExtrudedProfile(Width, Height);
-            UpdateBox(_extrudedProfile);
+            ExtrudedProfile = CreateExtrudedProfile(Width, Height);
+            UpdateBox(ExtrudedProfile);
+        }
+
+        private void ApplyDashPattern(Curve curve, double[] pattern)
+        {
+            if (pattern == null || pattern.Length == 0)
+                _dashedCurves = new List<Curve>{curve};
+
+            double curveLength = curve.GetLength();
+            List<Curve> dashes = new List<Curve>();
+
+            double offset0 = 0.0;
+            int index = 0;
+            while (true)
+            {
+                // Get the current dash length.
+                double dashLength = pattern[index++];
+                if (index >= pattern.Length)
+                    index = 0;
+
+                // Compute the offset of the current dash from the curve start.
+                double offset1 = offset0 + dashLength;
+                if (offset1 > curveLength)
+                    offset1 = curveLength;
+
+                // Solve the curve parameters at the current dash start and end.
+                double t0, t1;
+                curve.LengthParameter(offset0, out t0);
+                curve.LengthParameter(offset1, out t1);
+
+                Curve dash = curve.Trim(t0, t1);
+                if (dash != null)
+                {
+                    dashes.Add(dash);
+                }
+
+                // Get the current gap length.
+                double gapLength = pattern[index++];
+                if (index >= pattern.Length)
+                    index = 0;
+
+                // Set the start of the next dash to be the end of the current
+                // dash + the length of the adjacent gap.
+                offset0 = offset1 + gapLength;
+
+                // Abort when we've reached the end of the curve.
+                if (offset0 >= curveLength)
+                    break;
+            }
+
+            _dashedCurves = dashes;
         }
     }
 }

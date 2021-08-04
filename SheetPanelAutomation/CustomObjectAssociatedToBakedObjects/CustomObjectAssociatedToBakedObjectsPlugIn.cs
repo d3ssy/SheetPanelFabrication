@@ -77,7 +77,7 @@ namespace CustomObjectAssociatedToBakedObjects
             double height = double.Parse(e.OldRhinoObject.Attributes.GetUserString("Height"));
             CustomObjectAssociateToBakedObject customObject = new CustomObjectAssociateToBakedObject(new Line(newLine.PointAtStart, newLine.PointAtEnd), width, height);
             ObjRef geoRef = new ObjRef(e.OldRhinoObject);
-            e.Document.Objects.Delete(oldObj._objId, true);
+            e.Document.Objects.Delete(oldObj.ObjId, true);
             e.Document.Objects.Delete(geoRef, true, false);
             e.Document.Objects.AddRhinoObject(customObject, null);
         }
@@ -85,7 +85,7 @@ namespace CustomObjectAssociatedToBakedObjects
         private void AddBox(object sender, RhinoObjectEventArgs e)
         {
             if (!(e.TheObject is CustomObjectAssociateToBakedObject customGeo)) return;
-            customGeo._objId = e.TheObject.Document.Objects.AddBrep(customGeo._extrudedProfile, null);
+            customGeo.ObjId = e.TheObject.Document.Objects.AddBrep(customGeo.ExtrudedProfile, null);
         }
     }
 }
