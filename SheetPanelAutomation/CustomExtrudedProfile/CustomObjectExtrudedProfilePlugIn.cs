@@ -1,10 +1,10 @@
-﻿using Rhino;
-using Rhino.Commands;
+﻿
+using Rhino;
 using Rhino.DocObjects;
 using Rhino.Geometry;
 using Rhino.PlugIns;
 
-namespace CustomObject.PlugIn
+namespace CustomExtrudedProfile
 {
     ///<summary>
     /// <para>Every RhinoCommon .rhp assembly must have one and only one PlugIn-derived
@@ -14,20 +14,20 @@ namespace CustomObject.PlugIn
     /// attributes in AssemblyInfo.cs (you might need to click "Project" ->
     /// "Show All Files" to see it in the "Solution Explorer" window).</para>
     ///</summary>
-    [System.Runtime.InteropServices.Guid("61055a13-cd6d-4c5d-8978-0ee9a0560837")]
-    public class CreatesExtrusionPlugIn : Rhino.PlugIns.PlugIn
+    public class CustomObjectExtrudedProfilePlugIn : PlugIn
     {
-        public CreatesExtrusionPlugIn()
+        public CustomObjectExtrudedProfilePlugIn()
         {
             Instance = this;
             RhinoDoc.ModifyObjectAttributes += OnModifyObjectAttributes;
             RhinoDoc.BeforeTransformObjects += OnBeforeTransformObjects;
-            Command.EndCommand += EndCommand;
+            RhinoDoc.ReplaceRhinoObject += ReplaceRhinoObject;
         }
 
         ///<summary>Gets the only instance of the RhinoCommonTestPlugIn plug-in.</summary>
-        public static CreatesExtrusionPlugIn Instance { get; private set; }
+        public static CustomObjectExtrudedProfilePlugIn Instance { get; private set; }
 
+        public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
         protected override LoadReturnCode OnLoad(ref string errorMessage)
         {
             return LoadReturnCode.Success;
@@ -39,47 +39,44 @@ namespace CustomObject.PlugIn
 
         private void OnModifyObjectAttributes(object sender, RhinoModifyObjectAttributesEventArgs e)
         {
+            if (!(e.RhinoObject is CustomExtrudedProfileObject customGeo)) return;
+            customGeo.UpdateExtrudedProfile();
         }
 
         private void OnBeforeTransformObjects(object sender, RhinoTransformObjectsEventArgs e)
         {
             foreach (RhinoObject rhinoObject in e.GripOwners)
             {
-                if (!(rhinoObject is CustomGeo customGeo)) continue;
+                if (!(rhinoObject is CustomExtrudedProfileObject customGeo)) continue;
 
                 var grips = customGeo.GetGrips();
                 foreach (GripObject grip in grips)
                 {
-                    if (grip.OriginalLocation == customGeo.DatumLine.From)
+                    if (grip.OriginalLocation == customGeo.CentreLine.From)
                     {
-                        customGeo.DatumLine.From = grip.CurrentLocation;
+                        customGeo.CentreLine = new Line(grip.CurrentLocation, customGeo.CentreLine.To);
                         RhinoApp.WriteLine($"Transformed the start point -> {grip.CurrentLocation}");
                     }
 
-                    if (grip.OriginalLocation == customGeo.DatumLine.To)
+                    if (grip.OriginalLocation == customGeo.CentreLine.To)
                     {
-                        customGeo.DatumLine.To = grip.CurrentLocation;
+                        customGeo.CentreLine = new Line(customGeo.CentreLine.From, grip.CurrentLocation);
                         RhinoApp.WriteLine($"Transformed the end point -> {grip.CurrentLocation}");
                     }
                 }
             }
         }
 
-        private void EndCommand(object sender, CommandEventArgs e)
+        private void ReplaceRhinoObject(object sender, RhinoReplaceObjectEventArgs e)
         {
-            var doc = e.Document;
-            var objs = doc.Objects.FindByObjectType(ObjectType.Curve);
-            foreach (RhinoObject rhinoObject in objs)
-            {
-                if (!(rhinoObject.Geometry is Curve crv)) continue;
-                Line datumLine = new Line(crv.PointAtStart, crv.PointAtEnd);
-                double width = double.Parse(rhinoObject.Attributes.GetUserString("Width"));
-                double height = double.Parse(rhinoObject.Attributes.GetUserString("Height"));
-
-                ObjRef geoRef = new ObjRef(rhinoObject);
-                CustomGeo geo = new CustomGeo(datumLine, width, height);
-                _ = doc.Objects.Replace(geoRef, geo);
-            }
+            if (!(e.OldRhinoObject is CustomExtrudedProfileObject)) return;
+            var newLine = e.NewRhinoObject.Geometry as Curve;
+            double width = double.Parse(e.OldRhinoObject.Attributes.GetUserString("Width"));
+            double height = double.Parse(e.OldRhinoObject.Attributes.GetUserString("Height"));
+            CustomExtrudedProfileObject customObject = new CustomExtrudedProfileObject(new Line(newLine.PointAtStart, newLine.PointAtEnd), width, height);
+            ObjRef geoRef = new ObjRef(e.OldRhinoObject);
+            e.Document.Objects.Delete(geoRef, true, false);
+            e.Document.Objects.AddRhinoObject(customObject, null);
         }
     }
 }
